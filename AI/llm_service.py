@@ -15,7 +15,7 @@ class AgenteIA():
             max_output_tokens=1000,
         )
 
-    def analizar(self, texto: str, prompt_especifico: str) -> json:
+    def analizar_contratos(self, texto: str, prompt_especifico: str) -> json:
         """
         Función que analiza un contrato.
         Parámetros:

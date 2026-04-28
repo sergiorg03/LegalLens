@@ -36,3 +36,32 @@ def dashboard(request):
     return render(request, "contratos/dashboard.html", {"contratos": contratos})
 
 
+@login_required
+def subir_contrato(request):
+    """
+        Función que sube un contrato.
+        Parámetros:
+            - request: objeto request de Django
+        Retorna:
+            - render: template subir_contrato.html con el formulario de subida de contrato
+    """
+    if request.method == "POST":
+        form = ContratoForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            contrato = form.save()
+
+            contrato.nombre_orig_pdf = request.FILES["archivo_pdf"].name
+            contrato.save()
+
+            # Llamamos a la API pasando el contrato completo
+            resultado = llamar_api_ia(contrato)
+            guardar_resultado_ia(contrato, resultado)
+
+            return redirect("info_contrato", pk=contrato.pk)
+
+    else:
+        form = ContratoForm()
+
+    return render(request, "contratos/subir_contrato.html", {"form": form})
+
