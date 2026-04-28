@@ -10,5 +10,61 @@
     {% block extra_head %}{% endblock %}
 </head>
 
+<body>
+    <div class="wrap">
+        <header class="topbar">
+            <div class="topbar-inner">
+                <a class="brand" href="{% url 'dashboard' %}">
+                    <span class="logo" aria-hidden="true"></span>
+                    <span>LegalLens</span>
+                </a>
+                <nav class="nav" aria-label="Navegación">
+                    {% if user.is_authenticated %}
+                    <span class="user-greeting">Hola, <strong>{{ user.username }}</strong></span>
+                    <a href="{% url 'dashboard' %}">Panel</a>
+                    <a href="{% url 'subir_contrato' %}">Subir</a>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="link-btn">Cerrar sesión</button>
+                    </form>
+                    {% else %}
+                    <a href="{% url 'login' %}">Iniciar sesión</a>
+                    <a href="{% url 'registro' %}" class="btn-sm-primary">Registrarse</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li class="msg {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <div class="page-head">
+                <div>
+                    <h1>{% block page_title %}LegalLens{% endblock %}</h1>
+                    {% block page_subtitle %}{% endblock %}
+                </div>
+                {% block page_actions %}{% endblock %}
+            </div>
+
+            <section class="card">
+                {% block content %}{% endblock %}
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-inner">
+                <div>© {% now "Y" %} LegalLens</div>
+                <div>{% block footer_right %}Analiza contratos de forma rápida.{% endblock %}</div>
+            </div>
+        </footer>
+    </div>
+    {% block extra_js %}{% endblock %}
+</body>
 
 </html>
