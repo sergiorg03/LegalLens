@@ -1,0 +1,14 @@
+{% extends "contratos/base.html" %}
+
+{% block title %}Subir contrato · LegalLens{% endblock %}
+
+{% block page_title %}Subir contrato{% endblock %}
+{% block page_subtitle %}<p>Adjunta un PDF para analizarlo.</p>{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn-primary" type="submit">Subir</button>
+</form>
+{% endblock %}
