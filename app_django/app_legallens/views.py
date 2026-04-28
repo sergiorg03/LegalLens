@@ -10,6 +10,21 @@ from .services import llamar_api_ia, guardar_resultado_ia, obtener_resultado_ia
 
 logger = logging.getLogger(__name__)
 
+def registro(request):
+    """
+        Vista para el registro de nuevos usuarios.
+    """
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)  # Auto-login tras registro
+            return redirect("dashboard")
+    else:
+        form = UserCreationForm()
+    
+    return render(request, "registro/registro.html", {"form": form})
+
 @login_required
 def dashboard(request):
     """

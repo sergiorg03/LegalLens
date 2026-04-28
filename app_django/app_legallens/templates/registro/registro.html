@@ -1,0 +1,22 @@
+{% extends "contratos/base.html" %}
+
+{% block title %}Registro de Abogado - LegalLens{% endblock %}
+
+{% block page_title %}Únete a LegalLens{% endblock %}
+{% block page_subtitle %}Crea tu cuenta profesional para empezar a auditar contratos.{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Crear cuenta</button>
+    </form>
+    <div class="auth-footer">
+        <p>¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p>
+    </div>
+</div>
+
+{% endblock %}

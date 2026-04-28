@@ -1,0 +1,22 @@
+{% extends "contratos/base.html" %}
+
+{% block title %}Iniciar Sesión - LegalLens{% endblock %}
+
+{% block page_title %}Bienvenido de nuevo{% endblock %}
+{% block page_subtitle %}Inicia sesión para acceder a tu panel de auditoría.{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+    </form>
+    <div class="auth-footer">
+        <p>¿Aún no tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a></p>
+    </div>
+</div>
+
+{% endblock %}
