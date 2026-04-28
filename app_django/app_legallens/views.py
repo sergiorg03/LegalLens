@@ -65,3 +65,25 @@ def subir_contrato(request):
 
     return render(request, "contratos/subir_contrato.html", {"form": form})
 
+@login_required
+def info_contrato(request, pk: int):
+    """
+        Función que muestra la información del contrato seleccionado.
+        Parámetros:
+            - request: objeto request de Django
+            - pk: id del contrato a mostrar
+        Retorna:
+            - render: template info_contrato.html con el contrato seleccionado
+    """
+    contrato = get_object_or_404(Contrato, pk=pk)
+
+    resultado = obtener_resultado_ia(contrato)
+
+    return render(request, "contratos/info_contrato.html", {
+        "contrato": contrato,
+        "puntos_clave": resultado.get("puntos_clave"),
+        "banderas_rojas": resultado.get("banderas_rojas"),
+        "riesgo_total": resultado.get("riesgo_total"),
+        "entidades": resultado.get("entidades", {})
+    })
+

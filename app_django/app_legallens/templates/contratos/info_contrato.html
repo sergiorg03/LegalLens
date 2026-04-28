@@ -1,0 +1,97 @@
+{% extends "contratos/base.html" %}
+
+{% block title %}Contrato · LegalLens{% endblock %}
+
+{% block page_title %}Contrato: {{ contrato.nombre }}{% endblock %}
+{% block page_subtitle %}
+<br>
+<p>
+    Subido el {{ contrato.fecha_subida|date:"d/m/Y H:i" }}.
+    {% if contrato.archivo_pdf %}
+    <a class="btn" href="{{ contrato.archivo_pdf.url }}" target="_blank" rel="noopener">Ver PDF</a>
+    {% endif %}
+</p>
+{% endblock %}
+{% block content %}
+<div class="report-layout">
+    <!-- Izquierda: Visor del PDF -->
+    <div class="report-left">
+        {% if contrato.archivo_pdf %}
+        <iframe src="{{ contrato.archivo_pdf.url }}" width="100%" height="100%" style="border: none;"></iframe>
+        {% else %}
+        <div class="muted" style="padding: 20px;">Archivo PDF no disponible.</div>
+        {% endif %}
+    </div>
+
+    <!-- Derecha: Informe de la IA -->
+    <div class="report-right">
+        <div class="analysis-results">
+            <!-- Indicador de Estado -->
+            <div class="status-formal">
+                <strong>Estado del contrato:</strong>
+                {% if riesgo_total == "Crítico" or riesgo_total == "Medio" %}
+                <span class="text-abusive">Riesgo {{ riesgo_total }}: Se recomienda revisión manual</span>
+                {% else %}
+                <span class="text-safe">Riesgo Bajo: No se han detectado indicios graves</span>
+                {% endif %}
+            </div>
+
+            <!-- Datos Extraídos (Entidades) -->
+            <div class="result-section" style="margin-top: 20px;">
+                <h4>Datos Clave Extraídos</h4>
+                <table class="table" style="font-size: 0.9em; background: rgba(255,255,255,0.02);">
+                    <tr>
+                        <td><strong>Firmantes:</strong></td>
+                        <td>{{ entidades.nombres|join:", "|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DNI/ID:</strong></td>
+                        <td>{{ entidades.dni|join:", "|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fechas:</strong></td>
+                        <td>{{ entidades.fechas|join:", "|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Importes:</strong></td>
+                        <td>{{ entidades.importes|join:", "|default:"-" }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Resultados en Cuadrícula -->
+            <div class="result-grid" style="display: block;">
+                <div class="result-section">
+                    <h4>Resumen y Puntos Clave</h4>
+                    <ul class="clause-list">
+                        {% for punto in puntos_clave %}
+                        <li class="clause-item">{{ punto }}</li>
+                        {% empty %}
+                        <li class="clause-item muted">Sin información disponible.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% if banderas_rojas %}
+                <div class="result-section" style="margin-top: 20px;">
+                    <h4>Infracciones (Alertas)</h4>
+                    <ul class="clause-list">
+                        {% for bandera in banderas_rojas %}
+                        <li class="clause-item text-abusive" style="border-left-color: #ff4d4d;">{{ bandera }}</li>
+                        {% empty %}
+                        <li class="clause-item muted">No se identificaron infracciones.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Acciones Finales -->
+            <div class="actions-footer" style="margin-top: 30px;">
+                <a class="btn" href="{% url 'subir_contrato' %}">Subir otro</a>
+                <a class="btn btn-primary" href="{% url 'descargar_pdf' contrato.pk %}">Descargar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
