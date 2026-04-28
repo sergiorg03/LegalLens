@@ -6,14 +6,20 @@ from dotenv import load_dotenv
 # cargamos variables de entorno
 load_dotenv()
 
-class AgenteIA():
-    
+class AgenteIA:
     def __init__(self):
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
-            temperature=0,
-            max_output_tokens=1000,
-        )
+        api_key = os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            self.llm = None
+            print(
+                "WARNING: GOOGLE_API_KEY not found in environment. AI service will not work."
+            )
+        else:
+            self.llm = ChatGoogleGenerativeAI(
+                model="gemini-2.0-flash",
+                temperature=0,
+                max_output_tokens=1000,
+            )
 
     def analizar_contratos(self, texto: str, prompt_especifico: str) -> json:
         """
@@ -50,23 +56,30 @@ class AgenteIA():
             }}
         """
 
+        if not self.llm:
+            return {
+                "puntos_clave": ["Error"],
+                "banderas_rojas": ["Falta la API KEY de Google Gemini."],
+                "riesgo_total": "Desconocido",
+                "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
+            }
+
         prompt_usuario = f"Contrato:\n{texto}"
 
         try:
-            
             # Llamada al LLM
             response = self.llm.invoke([
-                ("system", prompt_sistema),
-                ("user", prompt_usuario)
-            ])
-            
+                    ("system", prompt_sistema),
+                    ("user", prompt_usuario),
+                ])
+
             contenido = response.content.strip()
-            
+
             # Limpiamos el texto para sacar solo el JSON
             inicio = contenido.find("{")
             fin = contenido.rfind("}") + 1
             json_str = contenido[inicio:fin]
-            
+
             return json.loads(json_str)
 
         except Exception as e:
@@ -75,8 +88,9 @@ class AgenteIA():
                 "puntos_clave": ["Error"],
                 "banderas_rojas": [f"Fallo de conexion: {str(e)}"],
                 "riesgo_total": "Critico",
-                "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []}
+                "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
             }
+
 
 # Instancia del agente
 agente = AgenteIA()
