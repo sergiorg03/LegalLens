@@ -1,0 +1,90 @@
+# =========================
+# GIT
+# =========================
+.git
+.gitignore
+
+# =========================
+# PYTHON CACHE
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# ENTORNOS VIRTUALES
+# =========================
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# VARIABLES DE ENTORNO
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# TESTING / COVERAGE
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.cache/
+
+# =========================
+# LOGS / TEMP
+# =========================
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+# =========================
+# IDEs / EDITORS
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# NOTEBOOKS
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# DATOS / MODELOS IA
+# =========================
+models/
+checkpoints/
+artifacts/
+wandb/
+mlruns/
+tensorboard/
+runs/
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.h5
+*.joblib
+*.pkl
+*.pickle
+
+# =========================
+# BASES DE DATOS
+# =========================
+*.sqlite3
+*.db
+
+# =========================
+# SISTEMA
+# =========================
+.DS_Store
+Thumbs.db

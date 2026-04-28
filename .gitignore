@@ -1,0 +1,122 @@
+# =========================
+# VARIABLES DE ENTORNO
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribución / build
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.manifest
+*.spec
+
+# =========================
+# ENTORNOS VIRTUALES
+# =========================
+.venv/
+venv/
+env/
+ENV/
+virtualenv/
+
+# =========================
+# TESTING / COVERAGE
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.cache/
+.hypothesis/
+coverage.xml
+*.cover
+
+# =========================
+# LOGS / DATABASES
+# =========================
+*.log
+logs/
+*.sqlite3
+*.db
+
+# =========================
+# FASTAPI
+# =========================
+*.pid
+uvicorn.log
+
+# =========================
+# DOCKER
+# =========================
+docker-compose.override.yml
+*.tar
+*.gz
+
+# =========================
+# AI / MACHINE LEARNING
+# =========================
+models/
+checkpoints/
+artifacts/
+wandb/
+mlruns/
+tensorboard/
+runs/
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.h5
+*.joblib
+*.pkl
+*.pickle
+
+# =========================
+# CACHE / TEMP FILES
+# =========================
+.cache/
+tmp/
+temp/
+*.tmp
+media/archivos_pdf/*
+
+# =========================
+# JUPYTER
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# IDEs / EDITORS
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# SISTEMA
+# =========================
+.DS_Store
+Thumbs.db
