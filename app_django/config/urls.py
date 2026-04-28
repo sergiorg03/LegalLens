@@ -22,7 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')), # Login, logout, etc.
-    path('', include('contratos.urls')) # Incluimos las rutas a mostrar desde la app
+    path('', include('app_legallens.urls')) # Incluimos las rutas a mostrar desde la app
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
