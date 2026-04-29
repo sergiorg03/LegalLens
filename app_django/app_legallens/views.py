@@ -59,7 +59,10 @@ def subir_contrato(request):
             guardar_resultado_ia(contrato, resultado)
 
             # Actualizamos el nombre del cliente con el extraido por la IA
-            contrato.cliente = resultado.get("cliente_extraido", "Desconocido")
+            cliente_extraido = resultado.get("cliente_extraido", "")
+            if not cliente_extraido or cliente_extraido == "Desconocido":
+                cliente_extraido = "Desconocido"
+            contrato.cliente = cliente_extraido
             contrato.save()
 
             return redirect("info_contrato", pk=contrato.pk)

@@ -44,10 +44,17 @@ class Contrato(ABC):
 class ContratoAlquiler(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Busca especificamente:
-        1. Si la fianza exigida supera el limite legal (1 mes).
-        2. Si el contrato obliga al inquilino a pagar reparaciones estructurales (Art. 21 LAU).
-        3. Clausulas de acceso del casero a la vivienda sin aviso.
+        Analiza segun la Ley de Arrendamientos Urbanos (LAU) espanola y la legislacion de consumo.
+        
+        Busca CUALQUIER clausula abusiva o desequilibrada, no solo las tipicas:
+        - Fianzas o depositos excesivos.
+        - Reparto injusto de gastos y reparaciones.
+        - Limitaciones excesivas al uso del inquilino.
+        - Penalizaciones desproporcionadas.
+        - Renuncia de derechos legales del inquilino.
+        - Facultades abusivas del arrendador.
+        
+        Si el contrato cumple la ley, NO marques nada como bandera_roja y pon riesgo_total como "Bajo".
         """
 
 
@@ -55,14 +62,32 @@ class ContratoAlquiler(Contrato):
 class ContratoNDA(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Busca especificamente:
-        1. Clausulas de duracion infinita o perpetua.
-        2. Multas desproporcionadas (superiores a 100.000E).
-        3. Definiciones de informacion confidencial demasiado amplias.
+        Analiza el acuerdo de confidencialidad buscando CUALQUIER clausula abusiva:
+        - Obligaciones desequilibradas entre las partes.
+        - Penalizaciones o multas desproporcionadas.
+        - Definiciones excesivamente amplias de informacion confidencial.
+        - Restricciones que limiten el trabajo o desarrollo profesional.
+        - Ausencia de excepciones legitimas al secreto.
+        
+        Si el NDA es estandar y equilibrado, NO marques nada como bandera_roja y pon riesgo_total como "Bajo".
+        """
+
+# Creación de un contrato generico
+class ContratoGenerico(Contrato):
+    def obtener_prompt_especifico(self) -> str:
+        return """
+        Analiza este contrato buscando CUALQUIER clausula abusiva, ilegal o desequilibrada:
+        - Obligaciones desproporcionadas para una de las partes.
+        - Penalizaciones o multas excesivas.
+        - Renuncia de derechos legales.
+        - Clausulas que limiten injustamente la libertad o derechos.
+        - Desequilibrios evidentes entre derechos y obligaciones.
+        - Terminos ambiguos que puedan perjudicar a una parte.
+        
+        Si el contrato parece equilibrado y legal, NO marques nada como bandera_roja y pon riesgo_total como "Bajo".
         """
 
 
-# Creacion del objeto contrato segun el tipo de contrato que sea
 class ContratoFactory:
     @staticmethod
     def crear_contrato(tipo: str, texto: str, cliente: str) -> Contrato:
@@ -71,4 +96,4 @@ class ContratoFactory:
         elif tipo.upper() == "NDA":
             return ContratoNDA(texto, cliente)
         else:
-            raise ValueError(f"Tipo de contrato desconocido: {tipo}")
+            return ContratoGenerico(texto, cliente)

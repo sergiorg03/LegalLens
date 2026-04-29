@@ -15,7 +15,7 @@ def llamar_api_ia(contrato):
                     "tipo": contrato.tipo,
                     "cliente": contrato.cliente
                 },
-                timeout=120
+                timeout=600
             )
 
             respuesta.raise_for_status()
@@ -31,7 +31,7 @@ def llamar_api_ia(contrato):
             ],
             "puntos_clave": ["Error en la comunicación con la IA"],
             "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
-            "cliente_extraido": "Error",
+            "cliente_extraido": "Desconocido",
         }
 
 def guardar_resultado_ia(contrato, resultado):
