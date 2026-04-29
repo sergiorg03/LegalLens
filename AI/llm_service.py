@@ -80,9 +80,9 @@ class AgenteIA:
         # 2. Fallback a Ollama
         return self._llamar_ollama(prompt_sistema, prompt_usuario)
 
-    def _llamar_ollama(self, system: str, user: str) -> dict:
+    def _llamar_ollama(self, system: str, user: str, reintentos: int = 3) -> dict:
         """
-        Llamada a Ollama como alternativa.
+        Llamada a Ollama como alternativa con reintentos.
         """
         url = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434/api/chat")
         model = os.getenv("OLLAMA_MODEL", "llama3")
@@ -97,20 +97,30 @@ class AgenteIA:
             "format": "json"
         }
 
-        try:
-            response = requests.post(url, json=payload, timeout=90)
-            response.raise_for_status()
-            data = response.json()
-            return self._limpiar_y_parsear_json(data['message']['content'])
-        except Exception as e:
-            print(f"ERROR: Ollama también fallo ({str(e)})")
-            return {
-                "puntos_clave": ["Error"],
-                "banderas_rojas": [f"Fallo total de IA (Gemini y Ollama): {str(e)}"],
-                "riesgo_total": "Crítico",
-                "cliente_extraido": "Desconocido",
-                "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
-            }
+        ultimo_error = None
+        for intento in range(1, reintentos + 1):
+            try:
+                print(f"DEBUG: Llamando a Ollama (intento {intento}/{reintentos})...")
+                response = requests.post(url, json=payload, timeout=120)
+                response.raise_for_status()
+                data = response.json()
+                print("DEBUG: Ollama respondio correctamente.")
+                return self._limpiar_y_parsear_json(data['message']['content'])
+            except Exception as e:
+                ultimo_error = str(e)
+                print(f"WARNING: Ollama fallo intento {intento}: {ultimo_error}")
+                if intento < reintentos:
+                    import time
+                    time.sleep(5 * intento)
+
+        print(f"ERROR: Ollama fallo tras {reintentos} reintentos. Ultimo error: {ultimo_error}")
+        return {
+            "puntos_clave": ["Error"],
+            "banderas_rojas": [f"Fallo total de IA (Gemini y Ollama): {ultimo_error}"],
+            "riesgo_total": "Crítico",
+            "cliente_extraido": "Desconocido",
+            "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
+        }
 
     def _limpiar_y_parsear_json(self, contenido: str) -> dict:
         """
