@@ -19,8 +19,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.contrib.auth import views as auth_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='registro/login.html'), name='login'),
     path('accounts/', include('django.contrib.auth.urls')), # Login, logout, etc.
     path('', include('app_legallens.urls')) # Incluimos las rutas a mostrar desde la app
 ]
