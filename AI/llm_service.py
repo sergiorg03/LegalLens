@@ -1,5 +1,6 @@
 import json
 import os
+import requests
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 
@@ -46,7 +47,7 @@ class AgenteIA:
             {{
                 "puntos_clave": ["..."],
                 "banderas_rojas": ["..."],
-                "riesgo_total": "Bajo" | "Medio" | "Critico",
+                "riesgo_total": "Bajo" | "Medio" | "Crítico",
                 "cliente_extraido": "Nombre del cliente/empresa principal",
                 "entidades": {{
                     "nombres": [],
@@ -57,42 +58,90 @@ class AgenteIA:
             }}
         """
 
-        if not self.llm:
-            return {
-                "puntos_clave": ["Error"],
-                "banderas_rojas": ["Falta la API KEY de Google Gemini."],
-                "riesgo_total": "Desconocido",
-                "cliente_extraido": "Desconocido",
-                "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
-            }
-
         prompt_usuario = f"Contrato:\n{texto}"
 
-        try:
-            # Llamada al LLM
-            response = self.llm.invoke([
+        # 1. Intentamos con Gemini si está configurado
+        if self.llm:
+            try:
+                response = self.llm.invoke([
                     ("system", prompt_sistema),
                     ("user", prompt_usuario),
                 ])
+                resultado = self._limpiar_y_parsear_json(response.content)
+                
+                # Validamos que no sea un error de cuota o similar camuflado
+                if "puntos_clave" in resultado and "Error" not in resultado["puntos_clave"][0]:
+                    return resultado
+                else:
+                    print("DEBUG: Gemini devolvió una respuesta inválida o error. Reintentando con Ollama...")
+            except Exception as e:
+                print(f"DEBUG: Gemini fallo ({str(e)}). Intentando Ollama...")
 
-            contenido = response.content.strip()
+        # 2. Fallback a Ollama
+        return self._llamar_ollama(prompt_sistema, prompt_usuario)
 
-            # Limpiamos el texto para sacar solo el JSON
-            inicio = contenido.find("{")
-            fin = contenido.rfind("}") + 1
-            json_str = contenido[inicio:fin]
+    def _llamar_ollama(self, system: str, user: str) -> dict:
+        """
+        Llamada a Ollama como alternativa.
+        """
+        url = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434/api/chat")
+        model = os.getenv("OLLAMA_MODEL", "llama3")
 
-            return json.loads(json_str)
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user}
+            ],
+            "stream": False,
+            "format": "json"
+        }
 
+        try:
+            response = requests.post(url, json=payload, timeout=90)
+            response.raise_for_status()
+            data = response.json()
+            return self._limpiar_y_parsear_json(data['message']['content'])
         except Exception as e:
-            # En caso de error devolvemos un JSON basico
+            print(f"ERROR: Ollama también fallo ({str(e)})")
             return {
                 "puntos_clave": ["Error"],
-                "banderas_rojas": [f"Fallo de conexion: {str(e)}"],
-                "riesgo_total": "Critico",
+                "banderas_rojas": [f"Fallo total de IA (Gemini y Ollama): {str(e)}"],
+                "riesgo_total": "Crítico",
                 "cliente_extraido": "Desconocido",
                 "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
             }
+
+    def _limpiar_y_parsear_json(self, contenido: str) -> dict:
+        """
+        Limpia y parsea el JSON de la respuesta, validando que tenga la estructura correcta.
+        """
+        fallback_error = {
+            "puntos_clave": ["Error de procesamiento"],
+            "banderas_rojas": ["La IA no pudo analizar este documento correctamente."],
+            "riesgo_total": "Crítico",
+            "cliente_extraido": "Desconocido",
+            "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
+        }
+
+        try:
+            contenido = contenido.strip()
+            inicio = contenido.find("{")
+            fin = contenido.rfind("}") + 1
+            if inicio == -1 or fin == 0:
+                return fallback_error
+                
+            json_str = contenido[inicio:fin]
+            datos = json.loads(json_str)
+            
+            # Validacion minima de claves
+            required_keys = ["puntos_clave", "banderas_rojas", "riesgo_total"]
+            if not all(key in datos for key in required_keys):
+                return fallback_error
+                
+            return datos
+        except Exception:
+            return fallback_error
 
 
 # Instancia del agente

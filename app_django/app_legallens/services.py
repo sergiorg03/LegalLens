@@ -15,7 +15,7 @@ def llamar_api_ia(contrato):
                     "tipo": contrato.tipo,
                     "cliente": contrato.cliente
                 },
-                timeout=60
+                timeout=120
             )
 
             respuesta.raise_for_status()
@@ -24,8 +24,11 @@ def llamar_api_ia(contrato):
     except Exception as e:
         print("ERROR IA: ", e)
         return {
-            "riesgo_total": "Bajo",
-            "banderas_rojas": [],
+            "riesgo_total": "Crítico",
+            "banderas_rojas": [
+                "No se pudo conectar con el servicio de IA o la cuota se ha agotado.",
+                f"Detalle técnico: {str(e)}"
+            ],
             "puntos_clave": ["Error en la comunicación con la IA"],
             "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
             "cliente_extraido": "Error",
@@ -46,8 +49,8 @@ def obtener_resultado_ia(contrato):
         return json.loads(contrato.resultado_ia) if contrato.resultado_ia else None
     except:
         return {
-            "riesgo_total": "Bajo",
-            "banderas_rojas": [],
+            "riesgo_total": "Crítico",
+            "banderas_rojas": ["Error al procesar la respuesta del servidor."],
             "puntos_clave": ["Error en el procesamiento de la respuesta. "],
             "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
             "cliente_extraido": "Error",

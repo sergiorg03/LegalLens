@@ -15,7 +15,7 @@ class EntidadesExtraidas(BaseModel):
 class AnalisisResultado(BaseModel):
     puntos_clave: List[str]
     banderas_rojas: List[str]
-    riesgo_total: str  # "Bajo", "Medio" o "Critico"
+    riesgo_total: str  # "Bajo", "Medio" o "Crítico"
     entidades: EntidadesExtraidas
     cliente_extraido: str
 
