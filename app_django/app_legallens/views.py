@@ -86,4 +86,14 @@ def info_contrato(request, pk: int):
         "riesgo_total": resultado.get("riesgo_total"),
         "entidades": resultado.get("entidades", {})
     })
-
+@login_required
+def descargar_pdf(request, pk: int):
+    """
+        Función que permite descargar el PDF de un contrato.
+    """
+    contrato = get_object_or_404(Contrato, pk=pk)
+    return FileResponse(
+        contrato.archivo_pdf.open("rb"),
+        as_attachment=True,
+        filename=contrato.nombre_orig_pdf
+    )
