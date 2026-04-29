@@ -17,6 +17,7 @@ class AnalisisResultado(BaseModel):
     banderas_rojas: List[str]
     riesgo_total: str  # "Bajo", "Medio" o "Critico"
     entidades: EntidadesExtraidas
+    cliente_extraido: str
 
 
 # Clase abstracta Base

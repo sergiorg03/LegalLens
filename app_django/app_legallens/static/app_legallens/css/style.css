@@ -147,27 +147,57 @@ main {
 
 form {
     display: grid;
-    gap: 12px;
+    gap: 16px;
+}
+
+form p {
+    margin: 0;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
 }
 
 input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="tel"],
+input[type="search"],
 input[type="file"],
 textarea,
 select {
+    display: block;
     width: 100%;
-    padding: 10px 12px;
+    padding: 12px 14px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.12);
     color: var(--text);
     outline: none;
+    font-family: inherit;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    appearance: none;
 }
 
 input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="tel"]:focus,
+input[type="search"]:focus,
 input[type="file"]:focus,
 textarea:focus,
 select:focus {
-    border-color: rgba(124, 58, 237, 0.55);
+    border-color: rgba(124, 58, 237, 0.6);
+    background: rgba(255, 255, 255, 0.08);
     box-shadow: var(--ring);
 }
 
@@ -557,14 +587,7 @@ button:hover,
 }
 
 .auth-form p {
-    margin-bottom: 20px;
-}
-
-.auth-form p label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: var(--muted);
+    margin-bottom: 0;
 }
 
 .auth-footer {
@@ -592,6 +615,19 @@ button:hover,
     color: var(--muted);
     margin-top: 4px;
     line-height: 1.4;
+}
+
+.errorlist {
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.errorlist li {
+    margin-bottom: 4px;
 }
 
 .text-center {

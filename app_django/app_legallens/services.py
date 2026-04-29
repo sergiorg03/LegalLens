@@ -28,6 +28,7 @@ def llamar_api_ia(contrato):
             "banderas_rojas": [],
             "puntos_clave": ["Error en la comunicación con la IA"],
             "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
+            "cliente_extraido": "Error",
         }
 
 def guardar_resultado_ia(contrato, resultado):
@@ -49,4 +50,5 @@ def obtener_resultado_ia(contrato):
             "banderas_rojas": [],
             "puntos_clave": ["Error en el procesamiento de la respuesta. "],
             "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
+            "cliente_extraido": "Error",
         }

@@ -47,6 +47,7 @@ class AgenteIA:
                 "puntos_clave": ["..."],
                 "banderas_rojas": ["..."],
                 "riesgo_total": "Bajo" | "Medio" | "Critico",
+                "cliente_extraido": "Nombre del cliente/empresa principal",
                 "entidades": {{
                     "nombres": [],
                     "dni": [],
@@ -61,6 +62,7 @@ class AgenteIA:
                 "puntos_clave": ["Error"],
                 "banderas_rojas": ["Falta la API KEY de Google Gemini."],
                 "riesgo_total": "Desconocido",
+                "cliente_extraido": "Desconocido",
                 "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
             }
 
@@ -88,6 +90,7 @@ class AgenteIA:
                 "puntos_clave": ["Error"],
                 "banderas_rojas": [f"Fallo de conexion: {str(e)}"],
                 "riesgo_total": "Critico",
+                "cliente_extraido": "Desconocido",
                 "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []},
             }
 

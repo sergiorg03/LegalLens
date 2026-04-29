@@ -23,7 +23,7 @@ def registro(request):
     else:
         form = UserCreationForm()
     
-    return render(request, "registro/registro.html", {"form": form})
+    return render(request, "registration/registro.html", {"form": form})
 
 @login_required
 def dashboard(request):
@@ -57,6 +57,10 @@ def subir_contrato(request):
             # Llamamos a la API pasando el contrato completo
             resultado = llamar_api_ia(contrato)
             guardar_resultado_ia(contrato, resultado)
+
+            # Actualizamos el nombre del cliente con el extraido por la IA
+            contrato.cliente = resultado.get("cliente_extraido", "Desconocido")
+            contrato.save()
 
             return redirect("info_contrato", pk=contrato.pk)
 
