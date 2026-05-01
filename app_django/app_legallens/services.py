@@ -15,7 +15,7 @@ def llamar_api_ia(contrato):
                     "tipo": contrato.tipo,
                     "cliente": contrato.cliente
                 },
-                timeout=600
+                timeout=1200
             )
 
             respuesta.raise_for_status()
