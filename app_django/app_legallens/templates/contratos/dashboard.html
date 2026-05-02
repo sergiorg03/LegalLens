@@ -46,7 +46,7 @@
                     {% if not resultado or resultado.motivo == "Sin procesar" %}
                     <span class="badge badge-gray">Pendiente</span>
                     {% elif resultado.riesgo_total == "Crítico" or resultado.banderas_rojas %}
-                    <span class="badge badge-red">Banderas Rojas</span>
+                    <span class="badge badge-red">Con Infracciones</span>
                     {% else %}
                     <span class="badge badge-green">Limpio</span>
                     {% endif %}

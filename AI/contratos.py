@@ -44,31 +44,28 @@ class Contrato(ABC):
 class ContratoAlquiler(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza segun la Ley de Arrendamientos Urbanos (LAU) espanola y la legislacion de consumo.
+        Analiza este contrato de alquiler segun la Ley de Arrendamientos Urbanos (LAU) espanola.
         
-        Busca CUALQUIER clausula abusiva o desequilibrada, no solo las tipicas:
-        - Fianzas o depositos excesivos.
-        - Reparto injusto de gastos y reparaciones.
-        - Limitaciones excesivas al uso del inquilino.
-        - Penalizaciones desproporcionadas.
-        - Renuncia de derechos legales del inquilino.
-        - Facultades abusivas del arrendador.
-        
-        Si el contrato cumple la ley, NO marques nada como bandera_roja y pon riesgo_total como "Bajo".
+        REGLAS:
+        - Es LEGAL: fianza de 1 mes, reparaciones a cargo del propietario, acceso con aviso
+        - Es ILEGAL: fianza > 1 mes, reparaciones a cargo del inquilino, acceso sin aviso
+        - Si el contrato cumple la LAU: "banderas_rojas": [] y "riesgo_total": "Bajo"
+        - Si hay violaciones EXPLICITAS a la LAU: listarlas en "banderas_rojas"
+        - NO inventes clausulas que no esten escritas
         """
 
-
-# Clase Confidencialidad NDA
 class ContratoNDA(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza el acuerdo de confidencialidad buscando CUALQUIER clausula abusiva:
+        Analiza el acuerdo de confidencialidad buscando CUALQUIER clausula abusiva o señal de FRAUDE:
         - Obligaciones desequilibradas entre las partes.
         - Penalizaciones o multas desproporcionadas.
         - Definiciones excesivamente amplias de informacion confidencial.
         - Restricciones que limiten el trabajo o desarrollo profesional.
         - Ausencia de excepciones legitimas al secreto.
+        - COHERENCIA: Si el documento no parece un contrato real, contiene lenguaje sospechoso o incoherente, márcalo como FRAUDE.
         
+        Si el documento NO es un NDA o parece fraudulento, pon riesgo_total como "Crítico" y lístalo en banderas_rojas.
         Si el NDA es estandar y equilibrado, NO marques nada como bandera_roja y pon riesgo_total como "Bajo".
         """
 
@@ -76,15 +73,14 @@ class ContratoNDA(Contrato):
 class ContratoGenerico(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza este contrato buscando CUALQUIER clausula abusiva, ilegal o desequilibrada:
-        - Obligaciones desproporcionadas para una de las partes.
-        - Penalizaciones o multas excesivas.
-        - Renuncia de derechos legales.
-        - Clausulas que limiten injustamente la libertad o derechos.
-        - Desequilibrios evidentes entre derechos y obligaciones.
-        - Terminos ambiguos que puedan perjudicar a una parte.
+        Analiza este contrato buscando clausulas ILEGALES o ABUSIVAS.
         
-        Si el contrato parece equilibrado y legal, NO marques nada como bandera_roja y pon riesgo_total como "Bajo".
+        REGLAS:
+        - Es ILEGAL: obligaciones desproporcionadas, penalizaciones excesivas, renuncia a derechos legales
+        - Es LEGAL: clausulas equilibradas, penalizaciones justas, respeto a derechos
+        - Si el contrato es legal y justo: "banderas_rojas": [] y "riesgo_total": "Bajo"
+        - Si hay violaciones EXPLICITAS: listarlas en "banderas_rojas"
+        - NO inventes clausulas que no esten escritas
         """
 
 

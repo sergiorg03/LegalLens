@@ -33,7 +33,7 @@ INSTRUCCIONES:
 REGLAS:
 - Si el contrato es legal y justo, devuelve "banderas_rojas": [] y "riesgo_total": "Bajo"
 - NO marques como abusivas clausulas que sean legales y estandar
-- SOLO marca como bandera_roja si es ILEGAL o claramente abusiva segun la ley
+- SOLO marca como bandera_roja si es ILEGAL, claramente abusiva o SOSPECHOSA/FRAUDULENTA.
 - Si no encuentras el cliente, pon "Desconocido" en cliente_extraido
 """
 
