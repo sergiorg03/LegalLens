@@ -36,6 +36,11 @@ Crea un archivo llamado `.env` en la raíz del proyecto.
 ```powershell
 New-Item .env
 ```
+**En Linux (Bash):**
+```bash
+nano .env
+```
+
 **Contenido del archivo .env:**
 ```env
 # Google Gemini (Motor Principal)
