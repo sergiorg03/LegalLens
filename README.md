@@ -14,8 +14,10 @@ La arquitectura del proyecto es híbrida, utilizando **Google Gemini 1.5 Flash**
 
 ## Requisitos Previos
 
-- [Docker](https://www.docker.com/get-started) y [Docker Compose](https://docs.docker.com/compose/install/) instalados.
-- Una clave de API de Google AI Studio (opcional, para usar Gemini). Puedes obtenerla en [Google AI Studio](https://aistudio.google.com/).
+- **Docker**:
+  - **Linux**: Docker y Docker Compose instalados.
+  - **Windows**: [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y funcionando (se recomienda usar WSL2).
+- **API Key**: Una clave de API de Google AI Studio (opcional, para usar Gemini). Puedes obtenerla en [Google AI Studio](https://aistudio.google.com/).
 
 ## Configuración e Instalación
 
@@ -28,19 +30,24 @@ cd LegalLens
 ```
 
 ### 2. Configurar variables de entorno
-Crea un archivo `.env` en la raíz del proyecto (puedes copiar el contenido de ejemplo):
+Crea un archivo llamado `.env` en la raíz del proyecto. 
 
-```bash
-    # Google Gemini (Motor Principal)
-    GOOGLE_API_KEY=tu_clave_de_api_aqui
+**En Windows (PowerShell):**
+```powershell
+New-Item .env
+```
+**Contenido del archivo .env:**
+```env
+# Google Gemini (Motor Principal)
+GOOGLE_API_KEY=tu_clave_de_api_aqui
 
-    # Ollama (Motor Local / Fallback)
-    OLLAMA_MODEL=llama3.2:3b
-    OLLAMA_URL=http://ollama:11434/api/chat
+# Ollama (Motor Local / Fallback)
+OLLAMA_MODEL=llama3.2:3b
+OLLAMA_URL=http://ollama:11434/api/chat
 ```
 
 ### 3. Desplegar con Docker
-Ejecuta el siguiente comando para construir y levantar todos los servicios:
+Ejecuta el siguiente comando en tu terminal (CMD, PowerShell o Bash):
 
 ```bash
 docker compose up -d --build
