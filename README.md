@@ -43,12 +43,11 @@ nano .env
 
 **Contenido del archivo .env:**
 ```env
-# Google Gemini (Motor Principal)
+# Google Gemini (Motor Principal) - Recomendable si pagas alguna clave de Gemini  
 GOOGLE_API_KEY=tu_clave_de_api_aqui
 
 # Ollama (Motor Local / Fallback)
 OLLAMA_MODEL=llama3.2:3b
-OLLAMA_URL=http://ollama:11434/api/chat
 ```
 
 ### 3. Desplegar con Docker
