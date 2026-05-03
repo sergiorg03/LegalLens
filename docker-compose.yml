@@ -1,8 +1,8 @@
 services:
-  app_django:
+  backend:
     build:
       context: .
-      dockerfile: app_django/Dockerfile
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -11,14 +11,14 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
-      API_URL: http://ai:8001/analizar
+      API_URL: http://ai_engine:8001/analizar
     env_file:
       - .env
     depends_on:
       - db
     volumes:
       - .:/app
-    command: [ "python", "app_django/manage.py", "runserver", "0.0.0.0:8000" ]
+    command: [ "python", "backend/manage.py", "runserver", "0.0.0.0:8000" ]
     restart: unless-stopped
 
   ollama:
@@ -27,10 +27,10 @@ services:
       - ollama_data:/root/.ollama
     restart: unless-stopped
 
-  ai:
+  ai_engine:
     build:
       context: .
-      dockerfile: AI/Dockerfile
+      dockerfile: ai_engine/Dockerfile
     ports:
       - "8002:8001"
     env_file:
@@ -61,8 +61,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - app_django
-      - ai
+      - backend
+      - ai_engine
 
 volumes:
   postgres_data:

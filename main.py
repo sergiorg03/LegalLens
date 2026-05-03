@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 import fitz  # PyMuPDF
-from AI.llm_service import agente
-from AI.contratos import ContratoFactory
+from ai_engine.llm_service import agente
+from ai_engine.contratos import ContratoFactory
 import uvicorn
 import os
 import requests
@@ -17,9 +17,10 @@ ollama_state = {"model_ready": False, "downloading": False}
 
 def esperar_y_cargar_modelo_ollama():
     """Hilo en segundo plano que espera a Ollama y descarga el modelo."""
-    ollama_url = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434")
-    base_url = ollama_url.replace("/api/chat", "")
-    model = os.getenv("OLLAMA_MODEL", "llama3:8b")
+    ollama_url = os.getenv("OLLAMA_URL", "http://ollama:11434")
+    # Limpiamos la URL para obtener la base (host:puerto) sin endpoints
+    base_url = ollama_url.split("/api")[0].rstrip("/")
+    model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
     print(f"INFO: Verificando Ollama en {base_url}...")
 
@@ -47,9 +48,8 @@ def esperar_y_cargar_modelo_ollama():
         modelo_disponible = any(model in nombre for nombre in nombres_modelos)
 
         if not modelo_disponible:
-            print(f"INFO: Descargando modelo '{model}' de Ollama (puede tardar varios minutos)...")
+            print(f"INFO: El modelo '{model}' no esta. Iniciando descarga...")
             ollama_state["downloading"] = True
-            # Usamos stream=True para mantener la conexión activa durante la descarga
             with requests.post(
                 f"{base_url}/api/pull",
                 json={"name": model, "stream": True},
@@ -57,14 +57,20 @@ def esperar_y_cargar_modelo_ollama():
                 timeout=None
             ) as pull_resp:
                 pull_resp.raise_for_status()
-                # Ir viendo el progreso de descarga del modelo de Ollama en tiempo real
-                #for line in pull_resp.iter_lines():
-                #    if line:
-                #        # Imprimimos cada línea que devuelve Ollama (progreso)
-                #        print(line.decode('utf-8', errors='ignore'))"""
-            print(f"INFO: Modelo '{model}' descargado correctamente.")
+                for line in pull_resp.iter_lines():
+                    if line:
+                        try:
+                            chunk = json.loads(line)
+                            status = chunk.get("status", "")
+                            if status:
+                                print(f"DEBUG: Ollama -> {status}")
+                        except:
+                            pass
+            print(f"INFO: Descarga finalizada.")
+            ollama_state["model_ready"] = True
         else:
             print(f"INFO: Modelo '{model}' ya esta disponible.")
+            ollama_state["model_ready"] = True
 
         ollama_state["model_ready"] = True
     except Exception as e:
