@@ -47,7 +47,7 @@ nano .env
 GOOGLE_API_KEY=tu_clave_de_api_aqui
 
 # Ollama (Motor Local / Fallback)
-OLLAMA_MODEL=llama3.2:3b
+OLLAMA_MODEL=llama3:8b
 ```
 
 ### 3. Desplegar con Docker

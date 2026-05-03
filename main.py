@@ -21,7 +21,7 @@ def esperar_y_cargar_modelo_ollama():
     ollama_url = os.getenv("OLLAMA_URL", "http://ollama:11434")
     # Limpiamos la URL para obtener la base (host:puerto) sin endpoints
     base_url = ollama_url.split("/api")[0].rstrip("/")
-    model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+    model = os.getenv("OLLAMA_MODEL", "llama3:8b")
 
     print(f"INFO: Verificando Ollama en {base_url}...")
 

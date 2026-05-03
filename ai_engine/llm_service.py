@@ -13,7 +13,7 @@ class AgenteIA:
     def __init__(self):
         # Configuración Ollama
         self.ollama_url = os.getenv("OLLAMA_URL", "http://ollama:11434/api/chat")
-        self.model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+        self.model = os.getenv("OLLAMA_MODEL", "llama3:8b")
         
         # Configuración Gemini 
         self.gemini_key = os.getenv("GOOGLE_API_KEY")
