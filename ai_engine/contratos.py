@@ -44,14 +44,37 @@ class Contrato(ABC):
 class ContratoAlquiler(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza este contrato de alquiler segun la Ley de Arrendamientos Urbanos (LAU).
-        
+        Analiza este contrato de arrendamiento de vivienda habitual segun la Ley de
+        Arrendamientos Urbanos (LAU) espanola. Distingue entre clausulas legales,
+        notas orientativas del modelo y clausulas realmente pactadas.
+
+        Primero extrae los datos basicos: arrendador, arrendatario, vivienda, renta,
+        duracion, fianza, garantias, gastos, reparaciones, desistimiento, recuperacion
+        de vivienda, actualizacion de renta, acceso a la vivienda y resolucion.
+
         REGLAS ESTRICTAS:
-        - Es LEGAL: fianza de 1 mes, reparaciones a cargo del propietario, acceso con aviso
-        - Es ILEGAL: fianza > 1 mes, reparaciones a cargo del inquilino, acceso sin aviso
-        - Si el contrato cumple la LAU: "banderas_rojas": [] y "riesgo_total": "Bajo"
-        - Si hay violaciones EXPLICITAS a la LAU: listarlas en "banderas_rojas" y "riesgo_total": "Critico" o "Medio"
-        - NO inventes clausulas que no esten escritas
+        - Es legal y estandar: fianza legal de 1 mensualidad en vivienda, pequenas
+          reparaciones por uso ordinario a cargo del arrendatario, conservacion y
+          reparaciones necesarias a cargo del arrendador, desistimiento tras 6 meses
+          con preaviso de 30 dias, prorroga obligatoria hasta 5 anos si el arrendador
+          es persona fisica o 7 anos si es persona juridica, recuperacion de vivienda
+          por necesidad con causa legal y preaviso suficiente.
+        - Es bandera roja: acceso del arrendador sin aviso o en cualquier momento,
+          fianza legal superior a 1 mensualidad, garantia adicional que exceda los
+          limites legales, no devolucion automatica de la fianza, reparaciones
+          estructurales o de habitabilidad siempre a cargo del arrendatario, IBI,
+          comunidad, derramas o gastos de gestion cargados sin pacto claro o de forma
+          desproporcionada, subida unilateral o ilimitada de renta, penalizaciones
+          desproporcionadas, recuperacion o resolucion unilateral sin causa legal,
+          renuncia del arrendatario a derechos de prorroga, desistimiento o tutela
+          judicial.
+        - Si una clausula aparece solo como nota explicativa, pie de pagina o comentario
+          del modelo orientativo, no la marques como infraccion salvo que tambien este
+          incorporada como clausula pactada.
+        - Si el contrato cumple la LAU: "banderas_rojas": [] y "riesgo_total": "Bajo".
+        - Si hay violaciones explicitas a la LAU: listalas con una referencia breve a
+          la clausula afectada y usa "riesgo_total": "Medio" o "Crítico".
+        - NO inventes clausulas que no esten escritas.
         """
 
 class ContratoNDA(Contrato):

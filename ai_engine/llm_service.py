@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import time
 import requests
 from google import genai
@@ -34,7 +35,8 @@ class AgenteIA:
         Analiza un contrato usando Gemini o Ollama como fallback.
         """
         prompt_sistema = f"""
-            Eres un abogado experto en derecho contractual espanol.
+            Eres un abogado experto en derecho contractual espanol. Tu salida debe
+            ser estable, verificable y basada solo en el texto del contrato.
 
             Analiza el contrato y devuelve EXCLUSIVAMENTE un JSON valido con esta estructura exacta:
             {{
@@ -52,17 +54,21 @@ class AgenteIA:
             - Si el contrato es legal y justo, devuelve "banderas_rojas": [] y "riesgo_total": "Bajo"
             - NO marques como abusivas clausulas que sean legales y estandar
             - SOLO marca como bandera_roja si es ILEGAL, claramente abusiva o SOSPECHOSA/FRAUDULENTA.
+            - Cita la clausula o fragmento del contrato que justifica cada bandera roja.
+            - No uses Markdown, comentarios, texto adicional ni claves distintas a las solicitadas.
+            - riesgo_total solo puede ser uno de estos valores exactos: "Bajo", "Medio", "Crítico".
             - Si no encuentras el cliente, pon "Desconocido" en cliente_extraido
         """
 
-        prompt_usuario = f"Contrato:\n{texto[:20000]}"
+        prompt_usuario = f"Contrato:\n<<<INICIO_CONTRATO>>>\n{texto[:30000]}\n<<<FIN_CONTRATO>>>"
 
         # 1. Intentar con Gemini
         if self.client:
             try:
-                print("DEBUG: Intentando análisis con Gemini (gemini-2.5-flash)...")
+                gemini_model = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+                print(f"DEBUG: Intentando análisis con Gemini ({gemini_model})...")
                 response = self.client.models.generate_content(
-                    model='gemini-1.5-flash',
+                    model=gemini_model,
                     contents=f"{prompt_sistema}\n\n{prompt_usuario}",
                     config=types.GenerateContentConfig(
                         response_mime_type='application/json',
@@ -136,11 +142,59 @@ class AgenteIA:
             fin = contenido.rfind("}") + 1
             if inicio == -1 or fin == 0:
                 raise ValueError("No JSON found")
-                
-            return json.loads(contenido[inicio:fin])
+
+            return self._normalizar_resultado(json.loads(contenido[inicio:fin]))
         except Exception as e:
             print(f"DEBUG: Error parseando JSON: {e}")
             return self._get_error_final("Error de formato en la respuesta de la IA")
+
+    def _normalizar_resultado(self, resultado: dict) -> dict:
+        """Garantiza que la respuesta tenga siempre el contrato JSON esperado."""
+        if not isinstance(resultado, dict):
+            raise ValueError("La IA no devolvio un objeto JSON")
+
+        puntos_clave = self._normalizar_lista_texto(resultado.get("puntos_clave"))
+        banderas_rojas = self._normalizar_lista_texto(resultado.get("banderas_rojas"))
+        entidades = resultado.get("entidades") if isinstance(resultado.get("entidades"), dict) else {}
+
+        riesgo_total = self._normalizar_riesgo(resultado.get("riesgo_total"), banderas_rojas)
+        cliente_extraido = resultado.get("cliente_extraido") or "Desconocido"
+        if not isinstance(cliente_extraido, str):
+            cliente_extraido = "Desconocido"
+        cliente_extraido = cliente_extraido.strip() or "Desconocido"
+
+        return {
+            "puntos_clave": puntos_clave or ["No se han identificado puntos clave."],
+            "banderas_rojas": banderas_rojas,
+            "riesgo_total": riesgo_total,
+            "cliente_extraido": cliente_extraido,
+            "entidades": {
+                "nombres": self._normalizar_lista_texto(entidades.get("nombres")),
+                "dni": self._normalizar_lista_texto(entidades.get("dni")),
+                "fechas": self._normalizar_lista_texto(entidades.get("fechas")),
+                "importes": self._normalizar_lista_texto(entidades.get("importes")),
+            },
+        }
+
+    def _normalizar_lista_texto(self, valor) -> list:
+        if valor is None:
+            return []
+        if isinstance(valor, str):
+            valor = [valor]
+        if not isinstance(valor, list):
+            return []
+        return [str(item).strip() for item in valor if str(item).strip()]
+
+    def _normalizar_riesgo(self, valor, banderas_rojas: list) -> str:
+        texto = str(valor or "").strip().lower()
+        texto = re.sub(r"[\s_-]+", " ", texto)
+        if texto in {"critico", "crítico", "alto", "grave"}:
+            return "Crítico"
+        if texto in {"medio", "moderado"}:
+            return "Medio"
+        if texto in {"bajo", "limpio", "sin riesgo"}:
+            return "Bajo"
+        return "Medio" if banderas_rojas else "Bajo"
 
     def _get_error_final(self, mensaje: str) -> dict:
         return {

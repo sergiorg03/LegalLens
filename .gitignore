@@ -100,7 +100,7 @@ runs/
 tmp/
 temp/
 *.tmp
-app_django/media/*
+backend/media/archivos_pdf/*
 
 # =========================
 # JUPYTER

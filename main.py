@@ -3,6 +3,7 @@ import fitz  # PyMuPDF
 from ai_engine.llm_service import agente
 from ai_engine.contratos import ContratoFactory
 import uvicorn
+import json
 import os
 import requests
 import time
@@ -99,10 +100,15 @@ async def analizar_contrato(
         return {"error": "Solo se aceptan archivos PDF"}
 
     # Obtenemos el contenido y extraemos texto
-    texto = ''
+    texto = ""
     try:
         with fitz.open(stream=contenido, filetype="pdf") as f:
-            texto = "".join(page.get_text() for page in f)
+            paginas = []
+            for numero_pagina, page in enumerate(f, start=1):
+                texto_pagina = page.get_text().strip()
+                if texto_pagina:
+                    paginas.append(f"\n\n--- PAGINA {numero_pagina} ---\n{texto_pagina}")
+            texto = "".join(paginas)
     except Exception as e:
         return {"error": f"Error al leer el PDF: {str(e)}"}
     
