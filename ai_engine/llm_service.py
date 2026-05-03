@@ -77,7 +77,7 @@ class AgenteIA:
                 )
                 return self._limpiar_y_parsear_json(response.text)
             except Exception as e:
-                print(f"WARNING: Gemini fallo: {e}. Cayendo a Ollama...")
+                print(f"WARNING: Gemini fallo (Clave inválida o cuota agotada): {e}. Cayendo a Ollama...")
 
         # 2. Fallback a Ollama
         return self._llamar_ollama(prompt_sistema, prompt_usuario)
@@ -85,7 +85,7 @@ class AgenteIA:
     def _llamar_ollama(self, system: str, user: str, reintentos: int = 3) -> dict:
         """Llamada a Ollama con reintentos."""
         if not self._esperar_ollama():
-            return self._get_error_final("Ni Gemini ni Ollama están disponibles.")
+            return self._get_error_final("Ollama no está respondiendo. Verifica que el contenedor esté activo.")
 
         payload = {
             "model": self.model,
@@ -107,8 +107,12 @@ class AgenteIA:
                     url = url.split("/api")[0].rstrip("/") + "/api/chat"
                 
                 response = requests.post(url, json=payload, timeout=600)
+                
                 if response.status_code == 404:
-                    print(f"ERROR: Ollama devolvió 404. ¿Está el modelo '{self.model}' descargado?")
+                    msg = f"El modelo '{self.model}' no está disponible en Ollama. Puede que aún se esté descargando o el nombre sea incorrecto."
+                    print(f"ERROR: {msg}")
+                    return self._get_error_final(msg)
+
                 response.raise_for_status()
                 data = response.json()
                 raw_content = data.get('message', {}).get('content', '{}')
