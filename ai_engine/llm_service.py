@@ -13,7 +13,7 @@ class AgenteIA:
     def __init__(self):
         # Configuración Ollama
         self.ollama_url = os.getenv("OLLAMA_URL", "http://ollama:11434/api/chat")
-        self.model = os.getenv("OLLAMA_MODEL", "llama3:8b")
+        self.model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
         
         # Configuración Gemini 
         self.gemini_key = os.getenv("GOOGLE_API_KEY")
@@ -109,7 +109,18 @@ class AgenteIA:
                 response = requests.post(url, json=payload, timeout=600)
                 
                 if response.status_code == 404:
-                    msg = f"El modelo '{self.model}' no está disponible en Ollama. Puede que aún se esté descargando o el nombre sea incorrecto."
+                    # Intentamos listar qué modelos hay realmente para ayudar al debug
+                    modelos_str = "Desconocido"
+                    try:
+                        base_url = url.split("/api")[0].rstrip("/")
+                        tags_resp = requests.get(f"{base_url}/api/tags", timeout=5)
+                        if tags_resp.status_code == 200:
+                            modelos = tags_resp.json().get("models", [])
+                            modelos_str = ", ".join([m.get("name", "") for m in modelos])
+                    except:
+                        pass
+                    
+                    msg = f"El modelo '{self.model}' no está disponible en Ollama. Modelos encontrados: [{modelos_str}]. Verifica el nombre en el archivo .env"
                     print(f"ERROR: {msg}")
                     return self._get_error_final(msg)
 

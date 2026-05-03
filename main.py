@@ -21,7 +21,7 @@ def esperar_y_cargar_modelo_ollama():
     ollama_url = os.getenv("OLLAMA_URL", "http://ollama:11434")
     # Limpiamos la URL para obtener la base (host:puerto) sin endpoints
     base_url = ollama_url.split("/api")[0].rstrip("/")
-    model = os.getenv("OLLAMA_MODEL", "llama3:8b")
+    model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
     print(f"INFO: Verificando Ollama en {base_url}...")
 
@@ -51,29 +51,68 @@ def esperar_y_cargar_modelo_ollama():
         if not modelo_disponible:
             print(f"INFO: El modelo '{model}' no esta. Iniciando descarga...")
             ollama_state["downloading"] = True
-            with requests.post(
-                f"{base_url}/api/pull",
-                json={"name": model, "stream": True},
-                stream=True,
-                timeout=None
-            ) as pull_resp:
-                pull_resp.raise_for_status()
-                for line in pull_resp.iter_lines():
-                    if line:
-                        try:
-                            chunk = json.loads(line)
-                            status = chunk.get("status", "")
-                            if status:
-                                print(f"DEBUG: Ollama -> {status}")
-                        except:
-                            pass
-            print(f"INFO: Descarga finalizada.")
-            ollama_state["model_ready"] = True
+            intentos_pull = 5
+            for intento_p in range(1, intentos_pull + 1):
+                try:
+                    print(f"INFO: Intentando descargar modelo '{model}' (intento {intento_p}/{intentos_pull})...")
+                    with requests.post(
+                        f"{base_url}/api/pull",
+                        json={"name": model, "stream": True},
+                        stream=True,
+                        timeout=None
+                    ) as pull_resp:
+                        pull_resp.raise_for_status()
+                        for line in pull_resp.iter_lines():
+                            if line:
+                                try:
+                                    chunk = json.loads(line)
+                                    if "error" in chunk:
+                                        error_msg = chunk['error']
+                                        print(f"ERROR en pull de Ollama: {error_msg}")
+                                        if any(k in error_msg.lower() for k in ["timeout", "connection", "retries", "eof"]):
+                                            raise Exception(f"Fallo de red: {error_msg}")
+                                        ollama_state["model_ready"] = False
+                                        return
+                                    
+                                    status = chunk.get("status", "")
+                                    if status and ("pulling" not in status or "100%" in status):
+                                        print(f"DEBUG: Ollama -> {status}")
+                                except json.JSONDecodeError:
+                                    pass
+                    
+                    print(f"INFO: Descarga finalizada correctamente.")
+                    break # Éxito, salimos del bucle
+                except Exception as e:
+                    print(f"WARNING: Fallo en intento {intento_p}: {e}")
+                    if intento_p < intentos_pull:
+                        tiempo_espera = 15 * intento_p
+                        print(f"INFO: Reintentando en {tiempo_espera} segundos...")
+                        time.sleep(tiempo_espera)
+                    else:
+                        print(f"ERROR: No se pudo descargar el modelo tras {intentos_pull} intentos.")
+                        ollama_state["model_ready"] = False
+                        return
+
+            # Verificación final de que el modelo aparece en la lista
+            print(f"INFO: Verificando disponibilidad del modelo...")
+            for _ in range(15):
+                try:
+                    resp = requests.get(f"{base_url}/api/tags", timeout=5)
+                    modelos = resp.json().get("models", [])
+                    nombres_modelos = [m.get("name", "") for m in modelos]
+                    if any(model in nombre for nombre in nombres_modelos):
+                        print(f"INFO: Modelo '{model}' verificado y listo.")
+                        ollama_state["model_ready"] = True
+                        break
+                except:
+                    pass
+                time.sleep(2)
+            else:
+                print(f"WARNING: El modelo '{model}' se descargo pero no aparece en /api/tags.")
+                ollama_state["model_ready"] = True 
         else:
             print(f"INFO: Modelo '{model}' ya esta disponible.")
             ollama_state["model_ready"] = True
-
-        ollama_state["model_ready"] = True
     except Exception as e:
         print(f"WARNING: No se pudo verificar/descargar el modelo: {e}")
     finally:
