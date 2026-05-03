@@ -49,13 +49,19 @@ def esperar_y_cargar_modelo_ollama():
         if not modelo_disponible:
             print(f"INFO: Descargando modelo '{model}' de Ollama (puede tardar varios minutos)...")
             ollama_state["downloading"] = True
-            # Usamos stream=True para no tener timeout mientras descarga
-            pull_resp = requests.post(
+            # Usamos stream=True para mantener la conexión activa durante la descarga
+            with requests.post(
                 f"{base_url}/api/pull",
-                json={"name": model, "stream": False},
-                timeout=None  # Sin timeout para la descarga
-            )
-            pull_resp.raise_for_status()
+                json={"name": model, "stream": True},
+                stream=True,
+                timeout=None
+            ) as pull_resp:
+                pull_resp.raise_for_status()
+                # Ir viendo el progreso de descarga del modelo de Ollama en tiempo real
+                #for line in pull_resp.iter_lines():
+                #    if line:
+                #        # Imprimimos cada línea que devuelve Ollama (progreso)
+                #        print(line.decode('utf-8', errors='ignore'))"""
             print(f"INFO: Modelo '{model}' descargado correctamente.")
         else:
             print(f"INFO: Modelo '{model}' ya esta disponible.")
@@ -93,6 +99,17 @@ async def analizar_contrato(
             texto = "".join(page.get_text() for page in f)
     except Exception as e:
         return {"error": f"Error al leer el PDF: {str(e)}"}
+    
+    # Verificar si se extrajo texto
+    if not texto or len(texto.strip()) < 50:
+        print(f"WARNING: Texto extraído muy corto ({len(texto)} chars). PDF posiblemente vacío o sea imagen.")
+        return {
+            "puntos_clave": ["Error de lectura"],
+            "banderas_rojas": ["No se pudo extraer texto del documento. Verifica que el PDF no esté vacío o sea una imagen escaneada."],
+            "riesgo_total": "Crítico",
+            "cliente_extraido": "Desconocido",
+            "entidades": {"nombres": [], "dni": [], "fechas": [], "importes": []}
+        }
 
     try:
         

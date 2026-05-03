@@ -44,13 +44,13 @@ class Contrato(ABC):
 class ContratoAlquiler(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza este contrato de alquiler segun la Ley de Arrendamientos Urbanos (LAU) espanola.
+        Analiza este contrato de alquiler segun la Ley de Arrendamientos Urbanos (LAU).
         
-        REGLAS:
+        REGLAS ESTRICTAS:
         - Es LEGAL: fianza de 1 mes, reparaciones a cargo del propietario, acceso con aviso
         - Es ILEGAL: fianza > 1 mes, reparaciones a cargo del inquilino, acceso sin aviso
         - Si el contrato cumple la LAU: "banderas_rojas": [] y "riesgo_total": "Bajo"
-        - Si hay violaciones EXPLICITAS a la LAU: listarlas en "banderas_rojas"
+        - Si hay violaciones EXPLICITAS a la LAU: listarlas en "banderas_rojas" y "riesgo_total": "Critico" o "Medio"
         - NO inventes clausulas que no esten escritas
         """
 
@@ -73,14 +73,15 @@ class ContratoNDA(Contrato):
 class ContratoGenerico(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza este contrato buscando clausulas ILEGALES o ABUSIVAS.
+        Analiza este documento buscando puntos clave y cualquier cláusula que pueda ser abusiva o ilegal según el derecho contractual español.
         
-        REGLAS:
-        - Es ILEGAL: obligaciones desproporcionadas, penalizaciones excesivas, renuncia a derechos legales
-        - Es LEGAL: clausulas equilibradas, penalizaciones justas, respeto a derechos
-        - Si el contrato es legal y justo: "banderas_rojas": [] y "riesgo_total": "Bajo"
-        - Si hay violaciones EXPLICITAS: listarlas en "banderas_rojas"
-        - NO inventes clausulas que no esten escritas
+        INSTRUCCIONES:
+        - Resume los puntos más importantes (partes, objeto, precio, duración).
+        - Identifica cláusulas que generen un desequilibrio importante o sean oscuras.
+        - COHERENCIA: Si el documento no tiene sentido o parece un fraude, márcalo como Crítico.
+        
+        Si el contrato es razonable: "banderas_rojas": [] y "riesgo_total": "Bajo".
+        Si detectas riesgos: lístalos en banderas_rojas y ajusta el riesgo_total.
         """
 
 

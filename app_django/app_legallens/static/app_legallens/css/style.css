@@ -471,6 +471,18 @@ button:hover,
     }
 }
 
+.pdf-fallback {
+    display: none;
+    padding: 20px;
+    text-align: center;
+    color: var(--muted);
+}
+
+/* Solo se muestra si el embed falla en navegadores sin soporte */
+@supports not (display: grid) {
+    .pdf-fallback { display: block; }
+}
+
 /* Tabla de Dashboard */
 .table-container {
     overflow-x: auto;

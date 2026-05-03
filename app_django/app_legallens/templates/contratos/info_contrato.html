@@ -17,7 +17,10 @@
     <!-- Izquierda: Visor del PDF -->
     <div class="report-left">
         {% if contrato.archivo_pdf %}
-        <iframe src="{{ contrato.archivo_pdf.url }}" width="100%" height="100%" style="border: none;"></iframe>
+        <embed src="{{ contrato.archivo_pdf.url }}" type="application/pdf" width="100%" height="100%" />
+        <div class="pdf-fallback">
+            <p>Si no puedes ver el PDF, <a href="{{ contrato.archivo_pdf.url }}" target="_blank">haz clic aquí para abrirlo</a>.</p>
+        </div>
         {% else %}
         <div class="muted" style="padding: 20px;">Archivo PDF no disponible.</div>
         {% endif %}
