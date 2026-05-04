@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 import json
+from django.conf import settings
 
 # Create your models here.
 def ruta_pdf(instance, filename):
@@ -13,6 +14,9 @@ class Contrato(models.Model):
         ("NDA", "Acuerdo de Confidencialidad (NDA)"),
     ]
 
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
+    )
     nombre = models.CharField(max_length=255)
     cliente = models.CharField(max_length=255, default="Desconocido")
     tipo = models.CharField(max_length=20, choices=TIPO_CONTRATO, default="ALQUILER")

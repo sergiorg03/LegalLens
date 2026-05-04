@@ -32,9 +32,8 @@ def dashboard(request):
         Retorna:
             - render: template dashboard.html con la lista de contratos
     """
-    contratos = Contrato.objects.all().order_by("-fecha_subida")
+    contratos = Contrato.objects.filter(usuario=request.user).order_by("-fecha_subida")
     return render(request, "contratos/dashboard.html", {"contratos": contratos})
-
 
 @login_required
 def subir_contrato(request):
@@ -49,7 +48,9 @@ def subir_contrato(request):
         form = ContratoForm(request.POST, request.FILES)
 
         if form.is_valid():
-            contrato = form.save()
+            contrato = form.save(commit=False)
+            contrato.usuario = request.user
+            contrato.save()
 
             contrato.nombre_orig_pdf = request.FILES["archivo_pdf"].name
             contrato.save()
@@ -82,7 +83,7 @@ def info_contrato(request, pk: int):
         Retorna:
             - render: template info_contrato.html con el contrato seleccionado
     """
-    contrato = get_object_or_404(Contrato, pk=pk)
+    contrato = get_object_or_404(Contrato, pk=pk, usuario=request.user)
 
     resultado = obtener_resultado_ia(contrato)
 
@@ -93,12 +94,13 @@ def info_contrato(request, pk: int):
         "riesgo_total": resultado.get("riesgo_total"),
         "entidades": resultado.get("entidades", {})
     })
+
 @login_required
 def descargar_pdf(request, pk: int):
     """
         Función que permite descargar el PDF de un contrato.
     """
-    contrato = get_object_or_404(Contrato, pk=pk)
+    contrato = get_object_or_404(Contrato, pk=pk, usuario=request.user)
     return FileResponse(
         contrato.archivo_pdf.open("rb"),
         as_attachment=True,
