@@ -4,6 +4,9 @@ LegalLens es una plataforma avanzada de análisis de contratos impulsada por Int
 
 La arquitectura del proyecto es híbrida, utilizando **Google Gemini 1.5 Flash** como motor principal de análisis y **Ollama (Llama 3.2)** como motor local de respaldo (fallback), garantizando así la disponibilidad del servicio en todo momento.
 
+> [!IMPORTANT]
+> **Aviso de Rendimiento y Recursos:** Debido a que el modelo local utilizado (Ollama) requiere una cantidad significativa de recursos de sistema (CPU/RAM) y no es extremadamente potente, la aplicación puede experimentar lentitud o fallos puntuales si el hardware no es suficiente para procesar las peticiones de forma fluida.
+
 ## Características Principales
 
 - **Análisis Inteligente**: Extracción automática de entidades (nombres, DNI, fechas, importes).
