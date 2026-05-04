@@ -47,7 +47,8 @@ def obtener_resultado_ia(contrato):
     """
     try:
         return json.loads(contrato.resultado_ia) if contrato.resultado_ia else None
-    except:
+    except Exception as e:
+        print(f"Error al parsear resultado IA: {e}")
         return {
             "riesgo_total": "Crítico",
             "banderas_rojas": ["Error al procesar la respuesta del servidor."],

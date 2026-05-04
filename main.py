@@ -104,8 +104,8 @@ def esperar_y_cargar_modelo_ollama():
                         print(f"INFO: Modelo '{model}' verificado y listo.")
                         ollama_state["model_ready"] = True
                         break
-                except:
-                    pass
+                except Exception as e:
+                    print(f"WARNING: Fallo en verificacion del modelo: {e}")
                 time.sleep(2)
             else:
                 print(f"WARNING: El modelo '{model}' se descargo pero no aparece en /api/tags.")

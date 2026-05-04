@@ -117,7 +117,7 @@ class AgenteIA:
                         if tags_resp.status_code == 200:
                             modelos = tags_resp.json().get("models", [])
                             modelos_str = ", ".join([m.get("name", "") for m in modelos])
-                    except:
+                    except Exception as e:
                         pass
                     
                     msg = f"El modelo '{self.model}' no está disponible en Ollama. Modelos encontrados: [{modelos_str}]. Verifica el nombre en el archivo .env"
@@ -142,7 +142,7 @@ class AgenteIA:
             try:
                 resp = requests.get(f"{base_url}/api/tags", timeout=3)
                 return resp.status_code == 200
-            except:
+            except Exception as e:
                 time.sleep(1)
         return False
 
