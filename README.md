@@ -60,8 +60,8 @@ Ejecuta el siguiente comando en tu terminal (CMD, PowerShell o Bash):
 docker compose up -d --build
 ```
 
-### 4. Ejecutar Migraciones
-Una vez que los contenedores estén activos, prepara la base de datos de Django:
+### 4. Ejecutar Migraciones (Automático)
+El sistema está configurado para ejecutar las migraciones automáticamente al iniciar el contenedor del backend. Sin embargo, si por algún motivo la base de datos no se actualiza correctamente, puedes ejecutarlas manualmente:
 
 ```bash
 docker compose exec backend python backend/manage.py migrate
