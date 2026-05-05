@@ -67,9 +67,18 @@ Una vez que los contenedores estén activos, prepara la base de datos de Django:
 docker compose exec backend python backend/manage.py migrate
 ```
 
-### 5. Comprobar el estado de los servicios
+### 5. Crear Superusuario
+Para acceder al panel de administración (Socio Senior) y ver las estadísticas globales, debes crear un usuario administrador:
+
 ```bash
-docker compose ps
+docker compose exec backend python backend/manage.py createsuperuser
+```
+
+Sigue las instrucciones en la terminal para configurar el nombre de usuario y la contraseña.
+
+### 6. Comprobar el estado de los servicios y ver logs
+```bash
+docker compose ps && docker compose logs ai_engine -f
 ```
 
 ## Uso del Sistema
@@ -78,6 +87,7 @@ docker compose ps
 2. Si no tienes cuenta, utilice el apartado de **Registro** para crear un usuario.
 3. Tras iniciar sesión, podrá subir un contrato en PDF desde el botón **Subir**.
 4. El sistema procesará el documento y mostrará el informe detallado de forma automática.
+5. Accede a **http://localhost/admin** con tu superusuario para ver el **Panel de Administración (Socio Senior)** con estadísticas globales sobre contratos y trampas comunes.
 
 ## Estructura del Proyecto
 

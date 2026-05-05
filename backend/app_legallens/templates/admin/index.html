@@ -1,0 +1,42 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'app_legallens/css/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="senior-header">
+        <h1>Bienvenido, Socio Senior</h1>
+        <p>Resumen global de actividad y riesgos detectados en LegalLens.</p>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>Contratos Analizados Hoy</h3>
+            <div class="value">{{ hoy_conteo }}</div>
+            <div class="trend">↑ Actividad reciente detectada</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Trampas más Comunes</h3>
+            {% if trampas_comunes %}
+                <ul class="traps-list">
+                {% for trampa, count in trampas_comunes %}
+                    <li>
+                        <span class="trap-text">{{ trampa|truncatechars:60 }}</span>
+                        <span class="trap-count">{{ count }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="no-traps-msg">No hay trampas registradas aún.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {{ block.super }}
+</div>
+{% endblock %}
