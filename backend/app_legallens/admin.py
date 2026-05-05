@@ -24,7 +24,7 @@ class LegalLensAdminSite(admin.AdminSite):
                 banderas = data.get("banderas_rojas", [])
                 for bandera in banderas:
                     traps_counter[bandera] += 1
-            except:
+            except Exception as e:
                 continue
         
         trampas_comunes = traps_counter.most_common(5)
