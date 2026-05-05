@@ -95,6 +95,3 @@ docker compose ps && docker compose logs ai_engine -f
 - `ai_engine/`: Microservicio en FastAPI que orquesta las llamadas a Gemini y Ollama.
 - `nginx/`: Configuración del servidor web y proxy.
 - `dataset/`: Ejemplos de contratos para pruebas de análisis.
-
----
-*Documentación técnica del proyecto LegalLens.*
