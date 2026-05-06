@@ -65,7 +65,7 @@ class AgenteIA:
         # 1. Intentar con Gemini
         if self.client:
             try:
-                gemini_model = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+                gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
                 print(f"DEBUG: Intentando análisis con Gemini ({gemini_model})...")
                 response = self.client.models.generate_content(
                     model=gemini_model,
