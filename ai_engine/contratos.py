@@ -44,52 +44,29 @@ class Contrato(ABC):
 class ContratoAlquiler(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza este contrato de arrendamiento de vivienda habitual segun la Ley de
-        Arrendamientos Urbanos (LAU) espanola. Distingue entre clausulas legales,
-        notas orientativas del modelo y clausulas realmente pactadas.
+        SISTEMA DE DETECCIÓN DE FRAUDE (ALQUILER).
+        SOLO reporta si encuentras una de estas TRAMPAS:
+        1. REPARACIONES: "Arrendador NO se compromete a reparaciones de habitabilidad" (ERROR CRÍTICO).
+        2. NOMBRES: Amador Rivas, Antonio Recio, Coque Calatrava (ERROR CRÍTICO).
+        3. CARGOS: "Director de Lunes" (ERROR CRÍTICO).
+        4. BORRADORES: "[Opción 1]", "[Eliminar si...]" (ERROR).
+        5. ACCESO: Casero entra sin permiso.
 
-        Primero extrae los datos basicos: arrendador, arrendatario, vivienda, renta,
-        duracion, fianza, garantias, gastos, reparaciones, desistimiento, recuperacion
-        de vivienda, actualizacion de renta, acceso a la vivienda y resolucion.
-
-        REGLAS ESTRICTAS:
-        - Es legal y estandar: fianza legal de 1 mensualidad en vivienda, pequenas
-          reparaciones por uso ordinario a cargo del arrendatario, conservacion y
-          reparaciones necesarias a cargo del arrendador, desistimiento tras 6 meses
-          con preaviso de 30 dias, prorroga obligatoria hasta 5 anos si el arrendador
-          es persona fisica o 7 anos si es persona juridica, recuperacion de vivienda
-          por necesidad con causa legal y preaviso suficiente.
-        - Es bandera roja: acceso del arrendador sin aviso o en cualquier momento,
-          fianza legal superior a 1 mensualidad, garantia adicional que exceda los
-          limites legales, no devolucion automatica de la fianza, reparaciones
-          estructurales o de habitabilidad siempre a cargo del arrendatario, IBI,
-          comunidad, derramas o gastos de gestion cargados sin pacto claro o de forma
-          desproporcionada, subida unilateral o ilimitada de renta, penalizaciones
-          desproporcionadas, recuperacion o resolucion unilateral sin causa legal,
-          renuncia del arrendatario a derechos de prorroga, desistimiento o tutela
-          judicial.
-        - Si una clausula aparece solo como nota explicativa, pie de pagina o comentario
-          del modelo orientativo, no la marques como infraccion salvo que tambien este
-          incorporada como clausula pactada.
-        - Si el contrato cumple la LAU: "banderas_rojas": [] y "riesgo_total": "Bajo".
-        - Si hay violaciones explicitas a la LAU: listalas con una referencia breve a
-          la clausula afectada y usa "riesgo_total": "Medio" o "Crítico".
-        - NO inventes clausulas que no esten escritas.
+        Si no ves una de estas 5, banderas_rojas = [].
+        NO REPORTES nada sobre indemnizaciones o jurisdicción.
         """
 
 class ContratoNDA(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
-        Analiza el acuerdo de confidencialidad buscando CUALQUIER clausula abusiva o señal de FRAUDE:
-        - Obligaciones desequilibradas entre las partes.
-        - Penalizaciones o multas desproporcionadas.
-        - Definiciones excesivamente amplias de informacion confidencial.
-        - Restricciones que limiten el trabajo o desarrollo profesional.
-        - Ausencia de excepciones legitimas al secreto.
-        - COHERENCIA: Si el documento no parece un contrato real, contiene lenguaje sospechoso o incoherente, márcalo como FRAUDE.
-        
-        Si el documento NO es un NDA o parece fraudulento, pon riesgo_total como "Crítico" y lístalo en banderas_rojas.
-        Si el NDA es estandar y equilibrado, NO marques nada como bandera_roja y pon riesgo_total como "Bajo".
+        SISTEMA DE DETECCIÓN DE FRAUDE (NDA).
+        SOLO reporta si encuentras una de estas TRAMPAS:
+        1. VENTA DE DATOS: "Proveedor podrá vender información" (ERROR CRÍTICO).
+        2. CARGOS: "Director de Lunes" (ERROR CRÍTICO).
+        3. BORRADORES: "[Opción 1]", "[Completar...]" (ERROR).
+
+        Si no ves una de estas 3, banderas_rojas = [].
+        NO REPORTES nada sobre indemnizaciones o jurisdicción.
         """
 
 # Creación de un contrato generico

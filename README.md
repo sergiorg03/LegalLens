@@ -47,11 +47,15 @@ nano .env
 **Contenido del archivo .env:**
 ```env
 # Google Gemini (Motor Principal) - Recomendable si pagas alguna clave de Gemini  
+GEMINI_MODEL=gemini-2.5-flash-lite
 GOOGLE_API_KEY=tu_clave_de_api_aqui
 
 # Ollama (Motor Local / Fallback)
-OLLAMA_MODEL=llama3.2:3b
+OLLAMA_MODEL=llama3:8b # llama3.2:3b
 ```
+
+> [!IMPORTANT]
+> **Aviso de Rendimiento y Recursos:** Si el dispositivo en el que se va a ejecutar la aplicación no cuenta con los suficientes recursos para ejecutar el modelo llama3:8b o superior, se recomienda utilizar el modelo llama3.2:3b.
 
 ### 3. Desplegar con Docker
 Ejecuta el siguiente comando en tu terminal (CMD, PowerShell o Bash):
