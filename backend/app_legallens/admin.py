@@ -48,3 +48,7 @@ class ContratoAdmin(admin.ModelAdmin):
         res = obj.get_resultado()
         return res.get("riesgo_total", "Desconocido")
     riesgo_display.short_description = "Riesgo IA"
+
+
+# TODO: Corregir la pantalla de admin y mostrar el apartado de trampas más comunes.
+# TODO: Seguir con el afinamiento de los prompts

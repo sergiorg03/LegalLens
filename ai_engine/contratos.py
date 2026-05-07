@@ -45,28 +45,43 @@ class ContratoAlquiler(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
         SISTEMA DE DETECCIÓN DE FRAUDE (ALQUILER).
-        SOLO reporta si encuentras una de estas TRAMPAS:
-        1. REPARACIONES: "Arrendador NO se compromete a reparaciones de habitabilidad" (ERROR CRÍTICO).
-        2. NOMBRES: Amador Rivas, Antonio Recio, Coque Calatrava (ERROR CRÍTICO).
-        3. CARGOS: "Director de Lunes" (ERROR CRÍTICO).
-        4. BORRADORES: "[Opción 1]", "[Eliminar si...]" (ERROR).
-        5. ACCESO: Casero entra sin permiso.
+        IGNORA cláusulas legales estándar. SOLO reporta FRAUDES REALES.
 
-        Si no ves una de estas 5, banderas_rojas = [].
-        NO REPORTES nada sobre indemnizaciones o jurisdicción.
+        ADVERTENCIA: Algunos estafadores usan encabezados como "MODELO ORIENTATIVO" para parecer legales. IGNORA el encabezado y busca estas TRAMPAS REALES:
+        1. REPARACIONES ILEGALES: "El inquilino paga TODAS las reparaciones, incluso estructurales o de habitabilidad" o "El casero NO se compromete a conservar la vivienda".
+        2. DEPÓSITOS ABSURDOS: Fianza superior a 3 meses de renta o cantidades de millones de euros.
+        3. ENTRADA SIN PERMISO: "El casero puede entrar en la casa cuando quiera sin avisar".
+        4. ABSURDO TOTAL: El contrato no tiene nombres reales, el precio es variable según el humor del dueño, o se pide el coche como garantía.
+        5. ILEGALIDAD EXTREMA: "Expulsión en 2 horas", "Trabajos forzados", "Deuda perpetua" o "Sanciones de 10 veces la renta por palabra".
+
+        NO REPORTES (ESTO ES LEGAL):
+        - Fianza de 1 o 2 meses.
+        - El inquilino paga pequeñas reparaciones por uso ordinario.
+        - Actualización anual por IPC.
+        - Indemnización por desistimiento antes de 6 meses.
+        - Sometimiento a tribunales de la ciudad.
+
+        Si el contrato parece legal y normal, banderas_rojas = [] y riesgo_total = "Bajo".
         """
 
 class ContratoNDA(Contrato):
     def obtener_prompt_especifico(self) -> str:
         return """
         SISTEMA DE DETECCIÓN DE FRAUDE (NDA).
-        SOLO reporta si encuentras una de estas TRAMPAS:
-        1. VENTA DE DATOS: "Proveedor podrá vender información" (ERROR CRÍTICO).
-        2. CARGOS: "Director de Lunes" (ERROR CRÍTICO).
-        3. BORRADORES: "[Opción 1]", "[Completar...]" (ERROR).
+        IGNORA cláusulas de confidencialidad estándar. SOLO reporta FRAUDES REALES.
 
-        Si no ves una de estas 3, banderas_rojas = [].
-        NO REPORTES nada sobre indemnizaciones o jurisdicción.
+        ADVERTENCIA: Algunos estafadores usan encabezados como "MODELO ORIENTATIVO" para parecer legales. IGNORA el encabezado y busca estas TRAMPAS REALES:
+        1. VENTA DE DATOS: "El receptor PODRÁ VENDER la información a terceros".
+        2. INDEMNIZACIONES ABSURDAS: Penas de 100 millones de euros por un simple descuido.
+        3. ROBO DE IDEAS: "El receptor se queda con la propiedad de todo lo que el emisor le cuente".
+
+        NO REPORTES (ESTO ES LEGAL):
+        - Deber de secreto.
+        - Devolver la información al terminar.
+        - Indemnización por daños y perjuicios reales (sin cifras locas).
+        - Duración de 2 o 5 años.
+
+        Si el contrato parece legal y normal, banderas_rojas = [] y riesgo_total = "Bajo".
         """
 
 # Creación de un contrato generico
